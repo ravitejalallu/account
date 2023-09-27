@@ -11,7 +11,7 @@ updated_by varchar(20)DEFAULT NULL
 
 CREATE TABLE  accounts(
 customer_id int NOT NULL,
-account_number int AUTO_INCREMENT PRIMARY KEY,
+account_number varchar(100) PRIMARY KEY,
 account_type varchar(100) NOT NULL,
 branch_address varchar(200) NOT NULL,
 created_at date NOT NULL,
