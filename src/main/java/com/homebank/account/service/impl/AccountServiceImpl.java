@@ -7,7 +7,7 @@ import com.homebank.account.exceptions.CustomerAlreadyExistsException;
 import com.homebank.account.exceptions.ResourceNotFoundException;
 import com.homebank.account.mapper.AccountsMapper;
 import com.homebank.account.mapper.CustomerMapper;
-import com.homebank.account.model.Accounts;
+import com.homebank.account.model.Account;
 import com.homebank.account.model.Customer;
 import com.homebank.account.repository.AccountsRepository;
 import com.homebank.account.repository.CustomerRepository;
@@ -15,7 +15,7 @@ import com.homebank.account.service.IAccountService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -36,11 +36,11 @@ public class AccountServiceImpl  implements IAccountService {
             throw new CustomerAlreadyExistsException("customer already registered with this mobile number "+customer.getMobileNumber());
         });
 
-        customer.setCreatedAt(LocalDateTime.now());
-        customer.setCreatedBy("Anonymous");
-        Customer savedCustomer = customerRepository.save(customer);
+        List<Account> accounts = List.of(createNewAccountByType(AccountsConstants.CHECKING,customer),
+                createNewAccountByType(AccountsConstants.SAVINGS,customer));
+        customer.getAccounts().addAll(accounts);
+         customerRepository.save(customer);
 
-        accountsRepository.save(createNewAccount(savedCustomer));
 
     }
 
@@ -48,23 +48,36 @@ public class AccountServiceImpl  implements IAccountService {
     public CustomerDto getAccount(String mobileNumber) {
         Customer customer = customerRepository.findByMobileNumber(mobileNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("customer", "mobileNumber", mobileNumber));
-        Accounts accounts = accountsRepository.findByCustomerId(customer.getCustomerId()).orElseThrow(() -> new ResourceNotFoundException("account", "customerId", customer.getCustomerId().toString()));
+         accountsRepository.findById(customer.getId()).orElseThrow(() -> new ResourceNotFoundException("account", "customerId", customer.getId().toString()));
         CustomerDto customerDto = CustomerMapper.mapToCustomerDto(customer, new CustomerDto());
-        AccountDto accountDto = AccountsMapper.mapToAccountsDto(accounts, new AccountDto());
-        customerDto.setAccountDto(accountDto);
+        List<Account> accounts = customer.getAccounts();
+        List<AccountDto> accountDtos = accounts.stream().map(account1 -> AccountsMapper.mapToAccountsDto(account1, new AccountDto())).toList();
+        customerDto.getAccountsDto().addAll(accountDtos);
         return customerDto;
 
 
     }
 
-    private Accounts createNewAccount(Customer customer){
-        Accounts accounts = new Accounts();
-        accounts.setCustomerId(customer.getCustomerId());
-        accounts.setAccountNumber(UUID.randomUUID().toString());
-        accounts.setBranchAddress(AccountsConstants.ADDRESS);
-        accounts.setAccountType(AccountsConstants.SAVINGS);
-        accounts.setCreatedAt(LocalDateTime.now());
-        accounts.setCreatedBy("Anonymous");
-        return  accounts;
+    @Override
+    public CustomerDto updateAccount(CustomerDto customerDto) {
+            Customer customer = customerRepository.findByMobileNumber(customerDto.getMobileNumber())
+                    .orElseThrow(() -> new ResourceNotFoundException("customer", "mobile", customerDto.getMobileNumber()));
+            CustomerMapper.mapToCustomer(customerDto, customer);
+            Customer savedCustomer = customerRepository.save(customer);
+        List<Account> accounts = savedCustomer.getAccounts();
+        List<AccountDto> accountDtos = accounts.stream().map(account -> AccountsMapper.mapToAccountsDto(account, new AccountDto())).toList();
+        CustomerDto savedCustomerDto = CustomerMapper.mapToCustomerDto(savedCustomer, new CustomerDto());
+        savedCustomerDto.getAccountsDto().addAll(accountDtos);
+        return savedCustomerDto;
+    }
+
+
+    private Account createNewAccountByType(String type, Customer customer){
+        Account account = new Account();
+        account.setAccountNumber((UUID.randomUUID().toString()));
+        account.setBranchAddress(AccountsConstants.ADDRESS);
+        account.setAccountType(type);
+        account.setCustomer(customer);
+        return account;
     }
 }

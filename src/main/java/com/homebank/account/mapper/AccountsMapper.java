@@ -1,21 +1,21 @@
 package com.homebank.account.mapper;
 
 import com.homebank.account.dto.AccountDto;
-import com.homebank.account.model.Accounts;
+import com.homebank.account.model.Account;
 
 public class AccountsMapper {
 
-    public static AccountDto mapToAccountsDto(Accounts accounts, AccountDto accountDto){
-        accountDto.setAccountNumber(accounts.getAccountNumber());
-        accountDto.setBranchAddress(accounts.getBranchAddress());
-        accountDto.setAccountType(accounts.getAccountType());
+    public static AccountDto mapToAccountsDto(Account account, AccountDto accountDto){
+        accountDto.setAccountNumber(account.getAccountNumber());
+        accountDto.setBranchAddress(account.getBranchAddress());
+        accountDto.setAccountType(account.getAccountType());
         return accountDto;
     }
 
-    public static Accounts mapToAccount(AccountDto accountDto, Accounts accounts){
-        accounts.setAccountNumber(accountDto.getAccountNumber());
-        accounts.setBranchAddress(accountDto.getBranchAddress());
-        accounts.setAccountType(accountDto.getAccountType());
-        return accounts;
+    public static Account mapToAccount(AccountDto accountDto, Account account){
+        account.setAccountNumber(accountDto.getAccountNumber());
+        account.setBranchAddress(accountDto.getBranchAddress());
+        account.setAccountType(accountDto.getAccountType());
+        return account;
     }
 }
