@@ -1,6 +1,6 @@
 package com.homebank.account.exceptions;
 
-import com.homebank.account.dto.ErrorResposnseDto;
+import com.homebank.account.dto.ErrorResponseDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -22,37 +22,37 @@ import java.util.Map;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResposnseDto>handleGlobalException(ResourceNotFoundException exception, WebRequest request){
-        ErrorResposnseDto errorResposnseDto = new ErrorResposnseDto(
+    public ResponseEntity<ErrorResponseDto>handleGlobalException(ResourceNotFoundException exception, WebRequest request){
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(
                 request.getDescription(false),
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 exception.getMessage(),
                 LocalDateTime.now()
         );
-        return new ResponseEntity<>(errorResposnseDto,HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorResponseDto,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
     @ExceptionHandler(CustomerAlreadyExistsException.class)
-    public ResponseEntity<ErrorResposnseDto>handleCustomerException(CustomerAlreadyExistsException exception, WebRequest request){
-        ErrorResposnseDto errorResposnseDto = new ErrorResposnseDto(
+    public ResponseEntity<ErrorResponseDto>handleCustomerException(CustomerAlreadyExistsException exception, WebRequest request){
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(
                 request.getDescription(false),
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage(),
                 LocalDateTime.now()
         );
-        return new ResponseEntity<>(errorResposnseDto,HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResponseDto,HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResposnseDto>handleResourceNotFoundException(ResourceNotFoundException exception, WebRequest request){
-        ErrorResposnseDto errorResposnseDto = new ErrorResposnseDto(
+    public ResponseEntity<ErrorResponseDto>handleResourceNotFoundException(ResourceNotFoundException exception, WebRequest request){
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(
                 request.getDescription(false),
                 HttpStatus.NOT_FOUND,
                 exception.getMessage(),
                 LocalDateTime.now()
         );
-        return new ResponseEntity<>(errorResposnseDto,HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorResponseDto,HttpStatus.NOT_FOUND);
     }
 
     @Override
